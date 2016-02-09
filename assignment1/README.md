@@ -1,4 +1,6 @@
 ```
+Link https://www.overleaf.com/4294390dqmwxr#/12734364/
+
 cd [the experiment folder]
 ln -s ../mnist.t7 mnist.t7
 ```
