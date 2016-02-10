@@ -11,9 +11,9 @@ ln -s ../mnist.t7 mnist.t7
 ```
 .
 ├── README.md
-├── dropout_LP_tanh_experiment   -- crunchy1
-├── dropout_MaxP_tanh_experiment   -- crunchy5
-├── nodropout_LP_tanh_experiment  -- crunchy5 (use full data) -- crunchy6 (use 80% )
-├── nodropout_MaxP_LeRu_experiment  
-└── nodropout_MaxP_tanh_experiment  -- crunchy6
+├── dropout_LP_tanh_experiment   -- (done) crunchy1 (80%)
+├── dropout_MaxP_tanh_experiment   -- (done) crunchy5 (80%) 
+├── nodropout_LP_tanh_experiment  -- (done) crunchy5 (use full data) -- (done) crunchy6 (use 80% )
+├── nodropout_MaxP_LeRu_experiment  --(training) crunchy5 (80%)
+└── nodropout_MaxP_tanh_experiment  -- (done) crunchy6 (80%)
 ```
