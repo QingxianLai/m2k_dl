@@ -28,11 +28,9 @@ testSet = {
 print '==> preprocessing data'
 testSet.data = testSet.data:float()
 
--- read in the mean std value
-ff = io.open("mean_n_std", "r")
-mean = ff:read()
-std = ff:read()
-ff:close()
+-- precomputed mean and std during training process
+mean = 25.550294698079
+std = 70.248199011263
 
 -- normalize the test data
 testSet.data[{ {},1,{},{} }]:add(-mean)
@@ -53,68 +51,50 @@ print('test data standard deviation: ' .. testStd)
 ---------------------------------------------------------------------
 require 'torch'   -- torch
 require 'xlua'    -- xlua provides useful tools, like progress bars
--- require 'optim'   -- an optimization package, for online and batch methods
 require 'nn'
 ----------------------------------------------------------------------
 print '==> defining test procedure'
 
--- test function
-function test()
-   -- local vars
-   local time = sys.clock()
+-- local vars
+local time = sys.clock()
 
-   model = torch.load("model.net")
-   model:evaluate()
+model = torch.load("results/model.net")
+model:evaluate()
 
-   -- test over test data
-   print('==> testing on test set:')
-   outf = io.open("prediction.csv", "w")
-   outf:write("Id,Prediction\n")
-   for t = 1,testSet:size() do
-      -- disp progress
-      xlua.progress(t, testSet:size())
+-- test over test data
+print('==> testing on test set:')
+outf = io.open("prediction.csv", "w")
+outf:write("Id,Prediction\n")
+count = 0
+for t = 1,testSet:size() do
 
-      -- get new sample
-      local input = testSet.data[t]
-      input = input:double()
+    -- disp progress
+    xlua.progress(t, testSet:size())
 
-      -- test sample
-      local pred = model:forward(input)
-        
-      local max_pred = -10000
-      local max_indx = 1
-      for i = 1,pred:size()[1] do
-          if pred[i] > max_pred then
-              max_pred = pred[i]
-              max_indx = i
-          end
+    -- get new sample
+    local input = testSet.data[t]
+    input = input:double()
+
+    -- test sample
+    local pred = model:forward(input)
+    local target = testSet.labels[t]
+
+    local max_pred = -10000
+    local max_indx = 1
+    for i = 1,pred:size()[1] do
+      if pred[i] > max_pred then
+          max_pred = pred[i]
+          max_indx = i
       end
+    end
+    if (max_indx == target) then count = count+1 end
+    outf:write(t .. "," .. max_indx .. "\n")
 
-      outf:write(t .. "," .. max_indx .. "\n")
-   end
-   outf:close()
-
-   -- timing
-   time = sys.clock() - time
-   time = time / testSet:size()
-   print("\n==> time to test 1 sample = " .. (time*1000) .. 'ms')
-
-   -- print confusion matrix
-
-   -- update log/plot
-   --testLogger:add{['% mean class accuracy (test set)'] = confusion.totalValid * 100}
-   --if opt.plot then
-      --testLogger:style{['% mean class accuracy (test set)'] = '-'}
-      --testLogger:plot()
-   --end
-
-   ---- averaged param use?
-   --if average then
-      ---- restore parameters
-      --parameters:copy(cachedparams)
-   --end
-   
-   ---- next iteration:
-   --confusion:zero()
 end
-test()
+outf:close()
+print ("\n The test accuracy is " .. count/testSet:size() )
+-- timing
+time = sys.clock() - time
+time = time / testSet:size()
+print("\n==> time to test 1 sample = " .. (time*1000) .. 'ms')
+
