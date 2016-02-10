@@ -61,7 +61,7 @@ function test()
    -- local vars
    local time = sys.clock()
 
-   model = torch.load("model.net")
+   model = torch.load("results/model.net")
    model:evaluate()
 
    -- test over test data
