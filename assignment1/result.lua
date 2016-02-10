@@ -28,11 +28,9 @@ testSet = {
 print '==> preprocessing data'
 testSet.data = testSet.data:float()
 
--- read in the mean std value
-ff = io.open("mean_n_std", "r")
-mean = ff:read()
-std = ff:read()
-ff:close()
+-- precomputed mean and std during training process
+mean = 25.550294698079
+std = 70.248199011263
 
 -- normalize the test data
 testSet.data[{ {},1,{},{} }]:add(-mean)
