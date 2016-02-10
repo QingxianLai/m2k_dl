@@ -18,5 +18,5 @@ ln -s ../mnist.t7 mnist.t7
 ├── nodropout_LP_LeRu_experiment  --(training) crunchy1 (80%)
 ├── dropout_MaxP_LeRu_experiment  --(not start) 
 ├── dropout_LP_LeRu_experiment  -- (not start) 
-└── nodropout_MaxP_tanh_experiment  -- (done) crunchy6 (80%)
+└── nodropout_MaxP_tanh_experiment  -- (done) crunchy6 (80%) 99.17%
 ```
