@@ -1,6 +1,18 @@
 -- result.lua take model.net, produce the prediction.csv 
+
+-- Notice: the model file 'model.net' should be in the same foler of 
+--         this script when you run it
+
 -- team: m2k_dl
 
+
+require 'torch'   -- torch
+require 'xlua'    -- xlua provides useful tools, like progress bars
+require 'nn'
+
+---------------------------------------------------------------------
+-- prepare the test data set
+---------------------------------------------------------------------
 
 print '==> downloading dataset'
 -- Here we download dataset files. 
@@ -49,16 +61,13 @@ print('test data standard deviation: ' .. testStd)
 ---------------------------------------------------------------------
 -- make prediction on test dataset
 ---------------------------------------------------------------------
-require 'torch'   -- torch
-require 'xlua'    -- xlua provides useful tools, like progress bars
-require 'nn'
-----------------------------------------------------------------------
+
 print '==> defining test procedure'
 
 -- local vars
 local time = sys.clock()
 
-model = torch.load("results/model.net")
+model = torch.load("model.net")
 model:evaluate()
 
 -- test over test data
