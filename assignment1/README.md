@@ -3,6 +3,9 @@
 
 [Report](https://www.overleaf.com/4297276wzhxjq#/12744331/)
 
+```
+model.net link: http://www.cs.nyu.edu/\~ql516/model.net
+```
 
 ```
 cd [the experiment folder]
