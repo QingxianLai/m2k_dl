@@ -40,26 +40,26 @@ do -- data augmentation module
   end
 end
 
-do -- my data augmentation layer
-    local MyBatchFlip, parent = torch.class('nn.MyBatchFlip', 'nn.Module')
+--do -- my data augmentation layer
+    --local MyBatchFlip, parent = torch.class('nn.MyBatchFlip', 'nn.Module')
 
-    function MyBatchFlip: __init()
-        parent.__init(self)
-        self.train = true
-    end
+    --function MyBatchFlip: __init()
+        --parent.__init(self)
+        --self.train = true
+    --end
 
-    function MyBatchFlip:updateOutput(input)
-        if self.train then
-            local size = input:size()
-            multi_input = torch.repeatTensor(input, 4 * size[1], size[2], size[3], size[4])
+    --function MyBatchFlip:updateOutput(input)
+        --if self.train then
+            --local size = input:size()
+            --multi_input = torch.repeatTensor(input, 4 * size[1], size[2], size[3], size[4])
 
             
-        -- TODO: finish 
-        end
+        ---- TODO: finish 
+        --end
         
-    end
+    --end
 
-end
+--end
 
 print(c.blue '==>' ..' configuring model')
 local model = nn.Sequential()

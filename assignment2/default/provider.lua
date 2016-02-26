@@ -22,9 +22,46 @@ function parseDataLabel(d, numSamples, numChannels, height, width)
 end
 
 
+
+-- data augmentation
+function _balance_rand()
+    return torch.rand(1)[1] * 2 - 1
+end
+
+function data_augmentation(src,max_rotate,max_shift)
+    -- shift
+    src = image.translate(src, max_shift * _balance_rand(), max_shift * _balance_rand())
+    
+    -- rotate
+    src = image.rotate(src, max_rotate * _balance_rand())
+    return src
+end    
+
+
+function augmentTrain(trainData, n_fold)
+    local data  = trainData.data
+    local label = trainData.labels
+    local augData = torch.repeatTensor(data, n_fold+1, 1, 1, 1)
+    local auglabel = torch.repeatTensor(label, n_fold+1)
+    
+    for i  = 1, trainData.size() do
+        for j  = 1, n_fold do
+            augData[j * n_fold + i] = data_augmentation(augData[i], 0.3, 10)
+        end
+    end
+    local newTrain = {
+        data = augData,
+        labels = auglabel,
+        size = function() return trainData.size() * (n_fold + 1) end
+    }
+    return newTrain
+end
+
+
 local Provider = torch.class 'Provider'
 
 function Provider:__init(full)
+    local n_fold = 4
   local trsize = 4000
   local valsize = 1000  -- Use the validation here as the valing set
   local channel = 3
@@ -58,6 +95,8 @@ function Provider:__init(full)
   }
   self.trainData.data, self.trainData.labels = parseDataLabel(raw_train.data,
                                                    trsize, channel, height, width)
+   self.trainData = augmentTrain(self.trainData, n_fold)
+   print(self.trainData.size())
   local trainData = self.trainData
   self.valData = {
      data = torch.Tensor(),
@@ -130,3 +169,4 @@ function Provider:normalize()
   valData.data:select(2,3):add(-mean_v)
   valData.data:select(2,3):div(std_v)
 end
+
