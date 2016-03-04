@@ -64,6 +64,8 @@ MSRinit(vgg)
 
 -- check that we can propagate forward without errors
 -- should get 16x10 tensor
-print(#vgg:cuda():forward(torch.CudaTensor(16,3,32,32)))
+require 'cutorch'
+require 'cunn'
+print(#vgg:cuda():forward(torch.CudaTensor(16,3,96,96)))
 
 return vgg
