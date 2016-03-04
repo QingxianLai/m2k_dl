@@ -7,7 +7,7 @@ This set of code is modified from Sergey Zagoruyko's cifar.torch tutorial: [cifa
 Data processing:
 
 ```bash
-th -i provider.lua
+th -i data.lua
 ```
 
 ```lua
