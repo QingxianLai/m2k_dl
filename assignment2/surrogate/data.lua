@@ -54,15 +54,15 @@ function Provider:__init(full)
     local height = 96
     local width = 96
     
-    local psize = 4000
-    local K = 150 --augmented versions for each patch
+    local psize = 4096
+    local K = 128 --augmented versions for each patch
     local pheight = 32
     local pwidth = 32
 
-    if not paths.dirp('stl-10') then 
-        print("fail to read data")
-        return
-    end
+    --if not paths.dirp('stl-10') then 
+        --print("fail to read data")
+        --return
+    --end
 
     local raw_extra = torch.load('./stl-10/extra.t7b')
 
@@ -77,7 +77,8 @@ function Provider:__init(full)
     local l = torch.ByteTensor(psize*K)
     local idx = 1
     for i = 1, psize do
-        local this_d = raw_extra[_rand(exsize)]
+        io.write("\n" .. idx)
+        local this_d = raw_extra.data[1][_rand(exsize)]
         this_d = this_d:float()
         local x1 = _rand(width - pwidth)
         local y1 = _rand(height - pheight)
@@ -86,13 +87,14 @@ function Provider:__init(full)
         l[idx] = idx
         for j = 1,K-1 do
             local new_patch = data_augmentation(patch,pwidth,pheight,1.3,0.2,3,150)
-            t[j*K + idx]:copy(new_patch)
-            t[j*K + idx] = idx
-        idx = idx + 1
+            t[j*psize + idx]:copy(new_patch)
+            l[j*psize + idx] = idx
         end
+        idx = idx + 1
+        
     end
-    self.unlabelData.data = t
-    self.unlabelData.labels = l
+    self.unlabelData.data = t:float()
+    self.unlabelData.labels = l:float()
 
     self.unlabelData.size = function() return psize * K end
 
