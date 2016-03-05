@@ -151,7 +151,6 @@ function train()
         <html>
         <body>
         <title>%s - %s</title>
-        <img src="data:image/png;base64,%s">
         <h4>optimState:</h4>
         <table>
         ]]):format(opt.save,epoch,base64im))
@@ -161,7 +160,6 @@ function train()
             end
         end
         file:write'</table><pre>\n'
-        file:write(tostring(confusion)..'\n')
         file:write(tostring(model)..'\n')
         file:write'</pre></body></html>'
         file:close()

@@ -77,7 +77,6 @@ function Provider:__init(full)
     local l = torch.ByteTensor(psize*K)
     local idx = 1
     for i = 1, psize do
-        io.write("\n" .. idx)
         local this_d = raw_extra.data[1][_rand(exsize)]
         this_d = this_d:float()
         local x1 = _rand(width - pwidth)
