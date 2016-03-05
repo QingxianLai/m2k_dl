@@ -73,8 +73,8 @@ function Provider:__init(full)
         size = function() return exsize end
     }
 
-    local t = torch.ByteTensor(psize*K, channel, pheight, pwidth)
-    local l = torch.ByteTensor(psize*K)
+    local t = torch.FloatTensor(psize*K, channel, pheight, pwidth)
+    local l = torch.FloatTensor(psize*K)
     local idx = 1
     for i = 1, psize do
         local this_d = raw_extra.data[1][_rand(exsize)]
