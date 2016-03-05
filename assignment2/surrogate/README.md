@@ -17,7 +17,7 @@ torch.save('extra.t7',provider)
 
 Training:
 ```bash
-th train.lua --model vgg_bn_drop -s logs/vgg
+th train.lua --model surrogate -s logs/surrogate
 ```
 
 Note: cross-validation is not required for this assignment.
