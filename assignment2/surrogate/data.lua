@@ -19,7 +19,7 @@ function _contrast(src, c)
     for i = 1, src:size()[1] do
         local mean = src[i]:mean()
         new_image[i]:add(-mean):mul(F):add(mean)
-        new_image[i]:clamp(-255,255)
+        new_image[i]:clamp(0,255)
     end
     return new_image
 end
@@ -27,11 +27,11 @@ end
 
 function data_augmentation(src, width, height, max_expand, max_rotate, max_shift, max_contrast)
     -- expand
-    local exVal =  width * _rand(max_expand)
-    local _expand = image.scale(src, exVal)
-    local x1 = _rand(exVal - width-1)
-    local y1 = _rand(exVal - height-1)
-    src = image.crop(_expand, x1, y1, x1+width, y1 + height) 
+    --local exVal =  width * _rand(max_expand)
+    --local _expand = image.scale(src, exVal)
+    --local x1 = _rand(exVal - width-1)
+    --local y1 = _rand(exVal - height-1)
+    --src = image.crop(_expand, x1, y1, x1+width, y1 + height) 
 
     -- shift
     src = image.translate(src, max_shift * _balance_rand(), max_shift * _balance_rand())
@@ -40,7 +40,7 @@ function data_augmentation(src, width, height, max_expand, max_rotate, max_shift
     src = image.rotate(src, max_rotate * _balance_rand())
 
     -- contrast
-    src = _contrast(src, max_contrast*_balance_rand()) 
+    --src = _contrast(src, max_contrast*_balance_rand()) 
 
     return src
 end
@@ -78,14 +78,14 @@ function Provider:__init(full)
     local idx = 1
     for i = 1, psize do
         local this_d = raw_extra.data[1][_rand(exsize)]
-        this_d = this_d:float()
+        --this_d = this_d:float()
         local x1 = _rand(width - pwidth)
         local y1 = _rand(height - pheight)
         local patch = image.crop(this_d, x1, y1, x1+pwidth, y1+pheight)
         t[idx]:copy(patch)
         l[idx] = idx
         for j = 1,K-1 do
-            local new_patch = data_augmentation(patch,pwidth,pheight,1.3,0.2,3,150)
+            local new_patch = data_augmentation(patch,pwidth,pheight,2.3,0.2,3,150)
             t[j*psize + idx]:copy(new_patch)
             l[j*psize + idx] = idx
         end
