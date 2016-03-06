@@ -29,7 +29,16 @@ if opt.data == 'train' then
             idx = idx + 1
         end
     end
+elseif opt.data == 'extra' then
+    local raw = torch.load('./stl-10/extra.t7b')
+    data = torch.FloatTensor(100000, channel * width * height)
+    local idx = 1
+    for i = 1, #raw.data[1] do
+        data[idx]:copy(raw.data[1][i]:reshape(1, channel * width * height))
+        idx = idx + 1
+    end
 end
+
 data = data:float()
 
 
@@ -40,3 +49,4 @@ centroids, totalcounts = unsup.kmeans(data, k, opt.max_iter, opt.batchSize)
 
 --print(centroids)
 print(totalcounts)
+torch.save("centroids.t7", centroids)
