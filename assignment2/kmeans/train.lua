@@ -9,7 +9,7 @@ opt = lapp[[
    -b,--batchSize             (default 64)            batch size
    -k,--kclass                (default 10)            number of clusters
    -m,--model                    (default kmeans)        model name
-   -i,--max_iter                 (default 300)           maximum number of iterations
+   -i,--max_iter                 (default 100)           maximum number of iterations
 ]]
 
 print(opt)
@@ -41,12 +41,10 @@ end
 
 data = data:float()
 
-
 local k = opt.kclass
 
 print(data:size())
-centroids, totalcounts = unsup.kmeans(data, k, opt.max_iter, opt.batchSize)
+centroids,labels,totalcounts = unsup.kmeans(data, k, opt.max_iter, opt.batchSize)
 
---print(centroids)
 print(totalcounts)
-torch.save("centroids.t7", centroids)
+torch.save("labels.t7", labels)
