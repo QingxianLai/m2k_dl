@@ -1,2 +1,7 @@
 **/provider.t7
 **/stl-10/*
+*.t7
+*.t7d
+*.t7t
+*.t7.backup
+tsne_plot/

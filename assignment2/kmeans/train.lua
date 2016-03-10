@@ -33,11 +33,11 @@ if opt.data == 'train' then
 elseif opt.data == 'extra' then
     io.write("extra dataset")
     local raw = torch.load('./stl-10/extra.t7b')
-    data = torch.FloatTensor(5000, channel * width * height)
-    local index = torch.randperm(100000)[{{1,5000}}]
+    data = torch.FloatTensor(50000, channel * width * height)
+    local index = torch.randperm(100000)[{{1,50000}}]
     torch.save("index.t7", index)
-    for i = 1, 5000 do
-        xlua.progress(i, 5000)
+    for i = 1, 50000 do
+        xlua.progress(i, 50000)
         data[i]:copy(raw.data[1][index[i]]:reshape(1, channel * width * height))
     end
 end

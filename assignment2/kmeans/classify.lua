@@ -15,7 +15,7 @@ print (opt)
 local channel = 3
 local height = 96
 local width = 96
-local extraSize = 5000
+local extraSize = 50000
 -- load index
 local index = torch.load('./index.t7')
 
@@ -35,7 +35,7 @@ collectgarbage()
 
 
 -- change color space and normalize the extra dataset
-local normalization = nn.SpatialContrastiveNormalization(1,image.gaussian1D(1))
+local normalization = nn.SpatialContrastiveNormalization(1,image.gaussian1D(7))
 local mean_u = -3.1261832071966
 local std_u = 12.419259853307
 local mean_v = 1.4553072717114
@@ -51,7 +51,7 @@ end
 data:select(2,2):add(-mean_u)
 data:select(2,2):div(std_u)
 data:select(2,3):add(-mean_v)
-data:select(2,3):add(std_v)
+data:select(2,3):div(std_v)
 
 collectgarbage()
 
@@ -89,7 +89,7 @@ result={
 
 for i=1,10 do
     local cluster = clusters[i]
-    local thresh = math.ceil(0.3 * #cluster)
+    local thresh = math.ceil(0.2 * #cluster)
     local batchSize = 64
     local pred_all = torch.FloatTensor(#cluster)
     local pred_sum = torch.FloatTensor(10):zero()
@@ -111,21 +111,16 @@ for i=1,10 do
         pred_sum[pred_all[j]] = pred_sum[pred_all[j]] + 1
     end
     print(pred_sum)
-    
-    for j = 1,10 do
-        if pred_sum[j] >= thresh then
-            for k = 1, #cluster do
-                if pred_all[k] == j then
-                    table.insert(result.data, cluster[k])
-                    table.insert(result.labels, j)
-                end
-            end
-            break
+    local max_val, max_idx = torch.max(pred_sum, 1)
+    for j = 1, #cluster do
+        if pred_all[j] == max_idx[1] then
+            table.insert(result.data, cluster[j])
+            table.insert(result.labels, max_idx[1])
         end
     end
 end
 print(#result.data)
---torch.save("new_data.t7t", result)
+torch.save("new_data.t7t", result)
 
 
 
