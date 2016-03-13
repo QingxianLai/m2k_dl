@@ -8,7 +8,7 @@ require 'nn'
 
 opt = lapp[[
     -m,--model   (default "./model.net")    the model file
-    -i,--input   (default "./stl-10/val.t7b")  input data
+    -i,--input   (default "./stl-10/test.t7b")  input data
 ]]
 
 
@@ -80,7 +80,7 @@ model = torch.load(opt.model)
 model:evaluate()
 
 local batchSize =25
-local resultTensor = torch.FloatTensor(data:size()[1], 4608)
+local resultTensor = torch.FloatTensor(data:size()[1], 10)
 local nCorrect = 25
 
 for i=1, data:size()[1], batchSize do
@@ -90,7 +90,8 @@ for i=1, data:size()[1], batchSize do
     local t = torch.FloatTensor(m, 3, 96, 96):copy(data[{{i,lasti},{},{},{}}])
     local output = model:forward(t:cuda())
     local val,pred = torch.max(output,2)
-    local lastView = model:get(53).output
+    local lastView = model:get(54):get(6).output -- 10 
+    --local lastView = model:get(53).output -- 4098
     resultTensor[{{i,lasti}, {}}]:copy(lastView)
     for j=i,lasti do
         if label[j] == pred[j-i+1][1] then
@@ -100,5 +101,5 @@ for i=1, data:size()[1], batchSize do
 
 end
 
-torch.save("last_layer.t7", resultTensor)
+torch.save("last_layer_10.t7", resultTensor)
 print(string.format("The test score is %s", (nCorrect/data:size()[1])))

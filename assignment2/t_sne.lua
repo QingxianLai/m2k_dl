@@ -35,16 +35,17 @@ print(pic:size())
 
 
 -- load lastLayer outputs
-local data = torch.load("./last_layer.t7")
+data = torch.load("./last_layer.t7")
+data = data:float()
 print(data:size())
 
-opts = {ndims = 2, perplexity = 30, pca = 50, use_bh = true, theta=0.5}
-mapped_x1 = m.embedding.tsne(data, opts)
+--opts = {ndims = 2, perplexity = 30, pca = 50, use_bh = true, theta=0.5}
+--mapped_x1 = m.embedding.tsne(data, opts)
 
-print(mapped_x1:size())
+--print(mapped_x1:size())
 
-local im_size = 4096
-map_im = m.draw_image_map(mapped_x1, pic, im_size, 0, true)
-collectgarbage()
+--local im_size = 4096
+--map_im = m.draw_image_map(mapped_x1, pic, im_size, 0, true)
+--collectgarbage()
 
-image.save("./tsne_plot/val.png", map_im)
+--image.save("./tsne_plot/val.png", map_im)
