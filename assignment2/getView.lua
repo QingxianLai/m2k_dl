@@ -1,4 +1,3 @@
--- result.lua take model.net, produce the prediction.csv
 
 require 'torch'
 require 'xlua'
@@ -8,41 +7,51 @@ require 'cunn'
 require 'nn'
 
 opt = lapp[[
-    -m,--model   (default "./model.net")   the model file used for evaluaiton
-    -i,--input   (default "./stl-10/test.t7b")  the path to the test set
+    -m,--model   (default "./model.net")    the model file
+    -i,--input   (default "./stl-10/val.t7b")  input data
 ]]
 
 
-------------------------------------------------------------
--- prepare the test data set
-------------------------------------------------------------
-
-print "load in the test data..."
-local raw_test = torch.load(opt.input)
-if not raw_test then
-    print("input file not found")
+print "load in the test data"
+local raw_data = torch.load(opt.input)
+if not raw_data then
+    print("intput file not found")
     os.exit()
 end
 
-local testSize = 8000
 local channel = 3
 local width = 96
 local height = 96
 
-data = torch.FloatTensor(testSize, channel, width, height)
-label = torch.FloatTensor(testSize)
-
-local idx = 1
-for i = 1,10 do
-    for j = 1, #raw_test.data[i] do
-        data[idx]:copy(raw_test.data[i][j])
-        label[idx] = i
-        idx = idx+1
+if #raw_data.data == 10 then
+    -- train, val, test 
+    local size = #raw_data.data[1] * 10
+    data = torch.FloatTensor(size, channel, width, height)
+    label = torch.FloatTensor(size)
+    
+    local idx = 1
+    for i = 1,10 do
+        for j = 1,#raw_data.data[i] do
+            data[idx]:copy(raw_data.data[i][j])
+            label[idx] = i
+            idx = idx + 1
+        end
     end
+    raw_data = nil
+
+else
+    -- extra
+    local size = #raw_data.data[1]
+    data = torch.FloatTensor(size, channel, width, height)
+    label = nil
+    for i=1,size do
+        data[i]:copy(raw_data.data[1][i])
+    end
+    raw_data = nil
 end
 
-raw_test = nil
 collectgarbage()
+
 
 -- change color space and normalize it
 local normalization = nn.SpatialContrastiveNormalization(1, image.gaussian1D(7))
@@ -62,20 +71,17 @@ data:select(2,2):add(-mean_u)
 data:select(2,2):div(std_u)
 data:select(2,3):add(-mean_v)
 data:select(2,3):div(std_v)
-collectgarbage()
-
 
 
 -----------------------------------------------------------
 -- make prediction on test data
 -----------------------------------------------------------
-outf = io.open("prediction.csv", "w")
-outf:write("Id,Prediction\n")
 model = torch.load(opt.model)
 model:evaluate()
 
-local nCorrect = 0
 local batchSize =25
+local resultTensor = torch.FloatTensor(data:size()[1], 4608)
+local nCorrect = 25
 
 for i=1, data:size()[1], batchSize do
     xlua.progress(i, data:size()[1])
@@ -83,14 +89,16 @@ for i=1, data:size()[1], batchSize do
     local m = lasti - i + 1
     local t = torch.FloatTensor(m, 3, 96, 96):copy(data[{{i,lasti},{},{},{}}])
     local output = model:forward(t:cuda())
-    local val, pred = torch.max(output, 2)
+    local val,pred = torch.max(output,2)
+    local lastView = model:get(53).output
+    resultTensor[{{i,lasti}, {}}]:copy(lastView)
     for j=i,lasti do
-        outf:write(j .. "," .. pred[j-i+1][1] .. "\n")
         if label[j] == pred[j-i+1][1] then
             nCorrect = nCorrect + 1
         end
     end
-end
-outf.close()
-print(string.format("The test score is %s", (nCorrect/data:size()[1])))
 
+end
+
+torch.save("last_layer.t7", resultTensor)
+print(string.format("The test score is %s", (nCorrect/data:size()[1])))
