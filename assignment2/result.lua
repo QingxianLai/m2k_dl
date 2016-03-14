@@ -12,7 +12,6 @@ opt = lapp[[
     -i,--input   (default "./stl-10/test.t7b")  the path to the test set
 ]]
 
-
 ------------------------------------------------------------
 -- prepare the test data set
 ------------------------------------------------------------
@@ -92,5 +91,4 @@ for i=1, data:size()[1], batchSize do
     end
 end
 outf.close()
-print(string.format("The test score is %s", (nCorrect/data:size()[1])))
 
