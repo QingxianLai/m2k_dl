@@ -5,7 +5,7 @@ dofile './provider.lua'
 local c = require 'trepl.colorize'
 
 opt = lapp[[
-   -s,--save                  (default "logs")      subdirectory to save logs
+   -s,--save                  (default "logs/vgg_da_6")      subdirectory to save logs
    -b,--batchSize             (default 64)          batch size
    -r,--learningRate          (default 1)        learning rate
    --learningRateDecay        (default 1e-7)      learning rate decay

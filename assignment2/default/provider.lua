@@ -61,7 +61,7 @@ end
 local Provider = torch.class 'Provider'
 
 function Provider:__init(full)
-    local n_fold = 4
+    local n_fold = 6
   local trsize = 4000
   local valsize = 1000  -- Use the validation here as the valing set
   local channel = 3
