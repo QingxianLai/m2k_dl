@@ -17,6 +17,7 @@ local validfn = ptb_path .. "ptb.valid.txt"
 
 local vocab_idx = 0
 local vocab_map = {}
+local rmap = {}
 
 -- it does:
 -- read in the file, raplace \n with '<eos>'
@@ -33,6 +34,7 @@ local function load_data(fname)
         if vocab_map[data[i]] == nil then
             vocab_idx = vocab_idx + 1
             vocab_map[data[i]] = vocab_idx
+            rmap[vocab_idx] = data[i]
         end
         x[i] = vocab_map[data[i]]
     end
@@ -87,4 +89,5 @@ end
 return {traindataset=traindataset,
         testdataset=testdataset,
         validdataset=validdataset,
-        vocab_map=vocab_map}
+        vocab_map=vocab_map,
+        rmap=rmap}
