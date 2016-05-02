@@ -1,10 +1,3 @@
---
-----  Copyright (c) 2014, Facebook, Inc.
-----  All rights reserved.
-----
-----  This source code is licensed under the Apache 2 license found in the
-----  LICENSE file in the root directory of this source tree. 
-----
 
 gpu = false
 if gpu then
@@ -108,7 +101,35 @@ local function lstm(x, prev_c, prev_h)
 end
 
 
-function create_network()
+local function gru(x, prev_c, prev_h)
+
+    local i2h              = nn.Linear(params.rnn_size, 3*params.rnn_size)(x)
+    local h2h              = nn.Linear(params.rnn_size, 3*params.rnn_size)(prev_h)
+    local gates            = nn.CAddTable()({
+            nn.Narrow(2, 1, 2 * params.rnn_size)(i2h),
+            nn.Narrow(2, 1, 2 * params.rnn_size)(h2h),
+        })
+
+    gates = nn.SplitTable(2)(nn.Reshape(2, params.rnn_size)(gates))
+    local resetgate  = nn.Sigmoid()(nn.SelectTable(1)(gates))
+    local updategate = nn.Sigmoid()(nn.SelectTable(2)(gates))
+    local output = nn.Tanh()(nn.CAddTable()({
+            nn.Narrow(2, 2 * params.rnn_size+1, params.rnn_size)(i2h),
+            nn.CMulTable()({resetgate,
+                nn.Narrow(2, 2 * params.rnn_size+1, params.rnn_size)(h2h),})
+    }))
+    
+    local next_h = nn.CAddTable()({prev_h,
+            nn.CMulTable()({updategate,
+                nn.CSubTable()({output, prev_h,}),}),
+    })
+    
+    local next_c = prev_c
+    return next_c, next_h
+end
+
+
+function create_network(cell)
     local x                  = nn.Identity()()
     local y                  = nn.Identity()()
     local prev_s             = nn.Identity()()
@@ -120,7 +141,7 @@ function create_network()
         local prev_c         = split[2 * layer_idx - 1]
         local prev_h         = split[2 * layer_idx]
         local dropped        = nn.Dropout(params.dropout)(i[layer_idx - 1])
-        local next_c, next_h = lstm(dropped, prev_c, prev_h)
+        local next_c, next_h = cell(dropped, prev_c, prev_h)
         table.insert(next_s, next_c)
         table.insert(next_s, next_h)
         i[layer_idx] = next_h
@@ -130,7 +151,7 @@ function create_network()
     local pred               = nn.LogSoftMax()(h2y(dropped))
     local err                = nn.ClassNLLCriterion()({pred, y})
     local module             = nn.gModule({x, y, prev_s},
-                                      {err, nn.Identity()(next_s)})
+                                      {err, nn.Identity()(next_s), pred})
     --graph.dot(module.fg, "network", "./graph/network")
     -- initialize weights
     module:getParameters():uniform(-params.init_weight, params.init_weight)
@@ -138,10 +159,10 @@ function create_network()
 end
 
 
-function setup()
+function setup(cell)
     -- create the network, set up for model
     print("Creating a RNN LSTM network.")
-    local core_network = create_network()
+    local core_network = create_network(cell)
     paramx, paramdx = core_network:getParameters()
     model.s = {}
     model.ds = {}
@@ -194,7 +215,7 @@ function fp(state)
         local x = state.data[state.pos]
         local y = state.data[state.pos + 1]
         local s = model.s[i - 1]
-        model.err[i], model.s[i] = unpack(model.rnns[i]:forward({x, y, s}))
+        model.err[i], model.s[i], pred= unpack(model.rnns[i]:forward({x, y, s}))
         state.pos = state.pos + 1
     end
     
@@ -218,9 +239,10 @@ function bp(state)
         local s = model.s[i - 1]
         -- Why 1?
         local derr = transfer_data(torch.ones(1))
+        local dpred = transfer_data(torch.zeros(params.batch_size, params.vocab_size))
         -- tmp stores the ds
         local tmp = model.rnns[i]:backward({x, y, s},
-                                           {derr, model.ds})[3]
+                                           {derr, model.ds, dpred})[3]
         -- remember (to, from)
         g_replace_table(model.ds, tmp)
     end
@@ -299,7 +321,7 @@ for _, state in pairs(states) do
 end
 
 -- inital the model
-setup()
+setup(lstm)
 step = 0
 epoch = 0
 total_cases = 0
@@ -348,7 +370,7 @@ while epoch < params.max_max_epoch do
     end
 end
 
-torch.save("model.obj", model)
+torch.save("lstm_model.obj", model)
 
 run_test()
 print("Training is over.")
