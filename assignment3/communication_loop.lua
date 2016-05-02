@@ -1,3 +1,14 @@
+-- to understand:
+-- pcall means protected call, which will call a funciton and manage the error
+-- it first return whether there is an error raised while calling, then it will 
+-- return the function's return value
+--
+-- io.read("*line") means read teh next line
+--
+-- error(message) is raising the error with the message. 
+--
+-- pl.stringx is python style string operator
+
 stringx = require('pl.stringx')
 require 'io'
 

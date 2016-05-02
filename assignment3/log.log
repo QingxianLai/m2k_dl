@@ -1,0 +1,29 @@
+Running on CPU
+Network parameters:
+{
+  max_grad_norm : 5
+  seq_length : 20
+  batch_size : 20
+  lr : 1
+  max_max_epoch : 13
+  rnn_size : 200
+  init_weight : 0.1
+  decay : 2
+  dropout : 0
+  layers : 2
+  vocab_size : 10000
+  max_epoch : 4
+}
+Creating a RNN LSTM network.
+Starting training.
+epoch = 0.004, train perp. = 10111.446, wps = 779, dw:norm() = 5.282, lr = 1.000, since beginning = 0 mins.
+epoch = 0.104, train perp. = 7877.199, wps = 835, dw:norm() = 3.019, lr = 1.000, since beginning = 2 mins.
+epoch = 0.204, train perp. = 5831.551, wps = 835, dw:norm() = 4.382, lr = 1.000, since beginning = 4 mins.
+epoch = 0.304, train perp. = 4173.419, wps = 821, dw:norm() = 4.336, lr = 1.000, since beginning = 6 mins.
+epoch = 0.404, train perp. = 2930.689, wps = 803, dw:norm() = 4.454, lr = 1.000, since beginning = 8 mins.
+epoch = 0.504, train perp. = 2037.179, wps = 810, dw:norm() = 4.867, lr = 1.000, since beginning = 10 mins.
+epoch = 0.604, train perp. = 1388.459, wps = 832, dw:norm() = 4.241, lr = 1.000, since beginning = 11 mins.
+epoch = 0.703, train perp. = 942.898, wps = 827, dw:norm() = 4.175, lr = 1.000, since beginning = 13 mins.
+epoch = 0.803, train perp. = 636.782, wps = 823, dw:norm() = 4.449, lr = 1.000, since beginning = 15 mins.
+epoch = 0.903, train perp. = 424.829, wps = 831, dw:norm() = 4.688, lr = 1.000, since beginning = 17 mins.
+Validation set perplexity : 187.116

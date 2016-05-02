@@ -30,6 +30,7 @@ function g_enable_dropout(node)
     end
 end
 
+-- return a list of cloned nets
 function g_cloneManyTimes(net, T)
     local clones = {}
     local params, gradParams = net:parameters()
@@ -61,6 +62,7 @@ function g_init_gpu(args)
     g_make_deterministic(1)
 end
 
+-- set random state seed
 function g_make_deterministic(seed)
     torch.manualSeed(seed)
     cutorch.manualSeed(seed)

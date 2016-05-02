@@ -6,7 +6,7 @@
 ----  LICENSE file in the root directory of this source tree. 
 ----
 
-gpu = true
+gpu = false
 if gpu then
     require 'cunn'
     print("Running on GPU") 
@@ -19,6 +19,18 @@ end
 require('nngraph')
 require('base')
 ptb = require('data')
+
+
+function transfer_data(x)
+    if gpu then
+        return x:cuda()
+    else
+        return x
+    end
+end
+
+
+model = {}
 
 -- Trains 1 epoch and gives test ~182 perplexity.
 local params = {
@@ -36,15 +48,38 @@ local params = {
                 max_grad_norm=5 -- clip when gradients exceed this norm value
                }
 
-function transfer_data(x)
-    if gpu then
-        return x:cuda()
-    else
-        return x
-    end
-end
 
-model = {}
+-- Train 1 day and gives 82 perplexity.
+--[[
+local params = {batch_size=20,
+                seq_length=35,
+                layers=2,
+                decay=1.15,
+                rnn_size=1500,
+                dropout=0.65,
+                init_weight=0.04,
+                lr=1,
+                vocab_size=10000,
+                max_epoch=14,
+                max_max_epoch=55,
+                max_grad_norm=10}
+               ]]--
+
+
+---- Trains 1h and gives test 115 perplexity.
+--local params = {batch_size=20,
+                --seq_length=20,
+                --layers=2,
+                --decay=2,
+                --rnn_size=200,
+                --dropout=0,
+                --init_weight=0.1,
+                --lr=1,
+                --vocab_size=10000,
+                --max_epoch=4,
+                --max_max_epoch=13,
+                --max_grad_norm=5}
+
 
 local function lstm(x, prev_c, prev_h)
     -- Calculate all four gates in one go
@@ -72,6 +107,7 @@ local function lstm(x, prev_c, prev_h)
     return next_c, next_h
 end
 
+
 function create_network()
     local x                  = nn.Identity()()
     local y                  = nn.Identity()()
@@ -95,12 +131,15 @@ function create_network()
     local err                = nn.ClassNLLCriterion()({pred, y})
     local module             = nn.gModule({x, y, prev_s},
                                       {err, nn.Identity()(next_s)})
+    --graph.dot(module.fg, "network", "./graph/network")
     -- initialize weights
     module:getParameters():uniform(-params.init_weight, params.init_weight)
     return transfer_data(module)
 end
 
+
 function setup()
+    -- create the network, set up for model
     print("Creating a RNN LSTM network.")
     local core_network = create_network()
     paramx, paramdx = core_network:getParameters()
@@ -123,6 +162,7 @@ function setup()
     model.err = transfer_data(torch.zeros(params.seq_length))
 end
 
+
 function reset_state(state)
     state.pos = 1
     if model ~= nil and model.start_s ~= nil then
@@ -132,11 +172,13 @@ function reset_state(state)
     end
 end
 
+
 function reset_ds()
     for d = 1, #model.ds do
         model.ds[d]:zero()
     end
 end
+
 
 function fp(state)
     -- g_replace_table(from, to).  
@@ -162,6 +204,7 @@ function fp(state)
     -- cross entropy error
     return model.err:mean()
 end
+
 
 function bp(state)
     -- start on a clean slate. Backprop over time for params.seq_length.
@@ -196,6 +239,7 @@ function bp(state)
     paramx:add(paramdx:mul(-params.lr))
 end
 
+
 function run_valid()
     -- again start with a clean slate
     reset_state(state_valid)
@@ -212,6 +256,7 @@ function run_valid()
     print("Validation set perplexity : " .. g_f3(torch.exp(perp / len)))
     g_enable_dropout(model.rnns)
 end
+
 
 function run_test()
     reset_state(state_test)
@@ -232,11 +277,14 @@ function run_test()
     g_enable_dropout(model.rnns)
 end
 
+
+-- training
+
 if gpu then
     g_init_gpu(arg)
 end
 
--- get data in batches
+-- get data in batches {data = [a tensor where each column is a batch]}
 state_train = {data=transfer_data(ptb.traindataset(params.batch_size))}
 state_valid =  {data=transfer_data(ptb.validdataset(params.batch_size))}
 state_test =  {data=transfer_data(ptb.testdataset(params.batch_size))}
@@ -244,10 +292,13 @@ state_test =  {data=transfer_data(ptb.testdataset(params.batch_size))}
 print("Network parameters:")
 print(params)
 
+-- reset states
 local states = {state_train, state_valid, state_test}
 for _, state in pairs(states) do
     reset_state(state)
 end
+
+-- inital the model
 setup()
 step = 0
 epoch = 0
@@ -255,8 +306,9 @@ total_cases = 0
 beginning_time = torch.tic()
 start_time = torch.tic()
 print("Starting training.")
-words_per_step = params.seq_length * params.batch_size
-epoch_size = torch.floor(state_train.data:size(1) / params.seq_length)
+words_per_step = params.seq_length * params.batch_size -- 
+epoch_size = torch.floor(state_train.data:size(1) / params.seq_length) 
+
 
 while epoch < params.max_max_epoch do
 
@@ -295,5 +347,6 @@ while epoch < params.max_max_epoch do
         end
     end
 end
+
 run_test()
 print("Training is over.")
