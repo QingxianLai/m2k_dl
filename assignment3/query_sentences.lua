@@ -17,7 +17,8 @@ end
 
 
 -- read in model file
-model = torch.load("model.obj")
+model_file = "lstm_model.obj"
+model = torch.load(model_file)
 
 
 -- std in out loop

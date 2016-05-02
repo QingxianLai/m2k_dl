@@ -321,7 +321,7 @@ for _, state in pairs(states) do
 end
 
 -- inital the model
-setup(gru)
+setup(lstm)
 step = 0
 epoch = 0
 total_cases = 0
@@ -370,7 +370,7 @@ while epoch < params.max_max_epoch do
     end
 end
 
-torch.save("gru_model.obj", model)
+torch.save("lstm_model_2.obj", model)
 
 run_test()
 print("Training is over.")
