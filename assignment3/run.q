@@ -8,5 +8,5 @@ module purge
 module load torch-deps/7
 module load torch/intel/20151009
 
-pwd
+cd /home/ql516/m2k_dl/assignment3
 th main.lua
