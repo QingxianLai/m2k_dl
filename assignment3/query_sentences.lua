@@ -1,7 +1,14 @@
+-- this script assume the model file is in the same directory.
+
 stringx = require('pl.stringx')
 require 'io'
 require 'nngraph'
 require 'base'
+
+opt = lapp[[
+    -m,--model  (default "./lstm_model.obj")     the model file used for evaluation
+]]
+
 
 
 -- read in data and dictionaries
@@ -27,7 +34,7 @@ end
 
 
 -- read in model file
-model_file = "lstm_model.obj"
+model_file = opt.model
 model = torch.load(model_file)
 
 

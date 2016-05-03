@@ -1,6 +1,15 @@
+-- this script assume the data.lua in the same directory.
+-- print the perplexity of test data 
+
 require 'nngraph'
 require 'base'
 require 'xlua'
+
+
+opt = lapp[[
+    -m,--model   (default "./lstm_model.obj")   the model file used for evaluaiton
+]]
+
 
 ptb = require 'data'
 _ = ptb.traindataset(20)
@@ -10,7 +19,7 @@ state_test = {data=ptb.testdataset(batch_size)}
 
 
 -- load model
-model_file = "lstm_model.obj"
+model_file = opt.model
 model = torch.load(model_file)
 
 
