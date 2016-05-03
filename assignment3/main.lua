@@ -37,7 +37,7 @@ local params = {
                 lr=1, --learning rate
                 vocab_size=10000, -- limit on the vocabulary size
                 max_epoch=4,  -- when to start decaying learning rate
-                max_max_epoch=7, -- final epoch
+                max_max_epoch=20, -- final epoch
                 max_grad_norm=5 -- clip when gradients exceed this norm value
                }
 
@@ -321,7 +321,7 @@ for _, state in pairs(states) do
 end
 
 -- inital the model
-setup(lstm)
+setup(gru)
 step = 0
 epoch = 0
 total_cases = 0
@@ -370,7 +370,7 @@ while epoch < params.max_max_epoch do
     end
 end
 
-torch.save("lstm_model_2.obj", model)
+torch.save("gru_model_Ep20.obj", model)
 
 run_test()
 print("Training is over.")
