@@ -1,0 +1,28 @@
+[0mRunning on CPU[0m	
+[0mNetwork parameters:[0m	
+{
+  max_grad_norm : [0;36m5[0m
+  seq_length : [0;36m20[0m
+  batch_size : [0;36m20[0m
+  lr : [0;36m1[0m
+  max_max_epoch : [0;36m7[0m
+  rnn_size : [0;36m200[0m
+  init_weight : [0;36m0.1[0m
+  decay : [0;36m2[0m
+  dropout : [0;36m0[0m
+  layers : [0;36m2[0m
+  vocab_size : [0;36m10000[0m
+  max_epoch : [0;36m4[0m
+}
+[0mCreating a RNN LSTM network.[0m	
+[0mStarting training.[0m	
+[0mepoch = 0.004, train perp. = 9963.191, wps = 418, dw:norm() = 4.890, lr = 1.000, since beginning = 0 mins.[0m	
+[0mepoch = 0.104, train perp. = 7756.135, wps = 427, dw:norm() = 2.799, lr = 1.000, since beginning = 4 mins.[0m	
+[0mepoch = 0.204, train perp. = 5722.293, wps = 410, dw:norm() = 4.102, lr = 1.000, since beginning = 8 mins.[0m	
+[0mepoch = 0.304, train perp. = 4085.387, wps = 407, dw:norm() = 4.930, lr = 1.000, since beginning = 12 mins.[0m	
+[0mepoch = 0.404, train perp. = 2866.239, wps = 406, dw:norm() = 4.293, lr = 1.000, since beginning = 15 mins.[0m	
+[0mepoch = 0.504, train perp. = 1992.410, wps = 406, dw:norm() = 4.797, lr = 1.000, since beginning = 19 mins.[0m	
+[0mepoch = 0.604, train perp. = 1357.754, wps = 406, dw:norm() = 4.447, lr = 1.000, since beginning = 23 mins.[0m	
+[0mepoch = 0.703, train perp. = 922.062, wps = 406, dw:norm() = 3.967, lr = 1.000, since beginning = 27 mins.[0m	
+[0mepoch = 0.803, train perp. = 622.859, wps = 405, dw:norm() = 4.531, lr = 1.000, since beginning = 31 mins.[0m	
+[0mepoch = 0.903, train perp. = 415.567, wps = 404, dw:norm() = 4.560, lr = 1.000, since beginning = 35 mins.[0m	
