@@ -110,6 +110,6 @@ while true do
         for i = 1, #extra do
             io.write(extra[i] .. " ")
         end
-        io.write("\n")
+        io.write("\n\n")
     end
 end
