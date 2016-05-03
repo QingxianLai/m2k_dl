@@ -10,6 +10,7 @@ _ = data.traindataset(20)
 vocab_map = data.vocab_map
 vocab_rmap = data.rmap
 
+
 -- read std in
 function readline()
     local line = io.read("*line")
@@ -20,6 +21,7 @@ function readline()
     words = {}
     for i = 2,#line do
         words[i-1] = line[i]:lower()
+    end
     return {num, words}
 end
 
@@ -32,7 +34,7 @@ model = torch.load(model_file)
 
 local function reset_state()
     if model ~= nil and model.start_s ~= nil then
-        for d = 1, 2 * params.layers do
+        for d = 1, 2 * 2 do
             model.start_s[d]:zero()
         end
     end
@@ -42,11 +44,12 @@ end
 batch_size = 20
 
 local function encode(word)
-    local id = nil
+    
+    id = nil
     if vocab_map[word] ~= nil then
-        id = vocab_rmap[word]
+        id = vocab_map[word]
     else
-        id = vocab_rmap["<unk>"]
+        id = vocab_map["<unk>"]
     end
     local batch = torch.Tensor(batch_size):fill(id)
     return batch
@@ -77,13 +80,13 @@ local function query(num, words)
     for i = 1,num do   
         x = torch.Tensor(batch_size):fill(next_word)
         local y = x
-        _, model.s[1], pred = unpack(model.rnn[1]:forward({x, y, model.s[0]}))
+        _, model.s[1], pred = unpack(model.rnns[1]:forward({x, y, model.s[0]}))
         next_word = multi(pred[1])
         result[i+#words] = vocab_rmap[next_word]
         g_replace_table(model.s[0], model.s[1])
     end
     g_enable_dropout(model.rnns)
-    return results
+    return result
 end
 
 
@@ -107,8 +110,6 @@ while true do
         for i = 1, #extra do
             io.write(extra[i] .. " ")
         end
-        io.write("\n")
+        io.write("\n\n")
     end
 end
-
-
